@@ -2,7 +2,6 @@
 
 #include <stdlib.h>
 #include <stddef.h>
-#include <stdio.h>
 
 /********** Machine suivante **********/
 
@@ -100,37 +99,21 @@ int updateStockMax(ligneDeProduction* ligneDeProduction, int val){
 /********** Stock courrant dechet **********/
 
 int getStockCurDechet(ligneDeProduction* ligneDeProduction){
-  return ligneDeProduction->stockCourrantDechet[0];
+  return ligneDeProduction->stockCourrantDechet;
 }
 
 void setStockCurDechet(ligneDeProduction* ligneDeProduction, int stock){
-  ligneDeProduction->stockCourrantDechet[0] = stock;
-}
-
-int getStockCurDechet2(ligneDeProduction* ligneDeProduction){
-  return ligneDeProduction->stockCourrantDechet[1];
-}
-
-void setStockCurDechet2(ligneDeProduction* ligneDeProduction, int stock){
-  ligneDeProduction->stockCourrantDechet[1] = stock;
+  ligneDeProduction->stockCourrantDechet = stock;
 }
 
 /********** Stock courrant ressource **********/
 
 int getStockCurRessource(ligneDeProduction* ligneDeProduction){
-  return ligneDeProduction->stockCourrantRessource[0];
+  return ligneDeProduction->stockCourrantRessource;
 }
 
 void setStockCurRessource(ligneDeProduction* ligneDeProduction, int stock){
-  ligneDeProduction->stockCourrantRessource[0] = stock;
-}
-
-int getStockCurRessource2(ligneDeProduction* ligneDeProduction){
-  return ligneDeProduction->stockCourrantRessource[1];
-}
-
-void setStockCurRessource2(ligneDeProduction* ligneDeProduction, int stock){
-  ligneDeProduction->stockCourrantRessource[1] = stock;
+  ligneDeProduction->stockCourrantRessource = stock;
 }
 
 /********** Ajoue stock courrant **********/
@@ -138,38 +121,25 @@ void setStockCurRessource2(ligneDeProduction* ligneDeProduction, int stock){
 int addDechet(ligneDeProduction* ligneDeProduction, int val, int* nbDechetPortail){
   int diff = getStockMax(ligneDeProduction) - getStockCurDechet(ligneDeProduction) - getStockCurRessource(ligneDeProduction) - val;
   if( diff >= 0){
-    ligneDeProduction->stockCourrantDechet[0] += val;
+    ligneDeProduction->stockCourrantDechet += val;
   }
   else{
     setStockCurDechet(ligneDeProduction, getStockMax(ligneDeProduction) - getStockCurRessource(ligneDeProduction));
     *nbDechetPortail += diff;
   }
-  return ligneDeProduction->stockCourrantDechet[0];
+  return ligneDeProduction->stockCourrantDechet;
 }
 
 int addRessource(ligneDeProduction* ligneDeProduction, int val){
   if(getStockMax(ligneDeProduction) >= getStockCurDechet(ligneDeProduction) + getStockCurRessource(ligneDeProduction) + val){
-    ligneDeProduction->stockCourrantRessource[0] += val;
+    ligneDeProduction->stockCourrantRessource += val;
   }
   else{
     setStockCurRessource(ligneDeProduction, getStockMax(ligneDeProduction) - getStockCurDechet(ligneDeProduction));
   }
-  return ligneDeProduction->stockCourrantRessource[0];
+  return ligneDeProduction->stockCourrantRessource;
 }
 
-int addDechet2(ligneDeProduction* ligneDeProduction, int val){
-  ligneDeProduction->stockCourrantDechet[1] += val;
-  return ligneDeProduction->stockCourrantDechet[1];
-}
-
-int addRessource2(ligneDeProduction* ligneDeProduction, int val){
-  ligneDeProduction->stockCourrantRessource[1] += val;
-  return ligneDeProduction->stockCourrantRessource[1];
-}
-
-int getDechet(ligneDeProduction* ligneDeProduction){
-  return ligneDeProduction->stockCourrantDechet[0]+ligneDeProduction->stockCourrantDechet[1];
-}
 /********** Machine **********/
 
 void setMachine(ligneDeProduction* ligneDeProduction, machine* machine){
@@ -191,9 +161,7 @@ int addMachine(ligneDeProduction** newMachine, coord* coord, machine* machine, p
     setCoordLDP(*newMachine,coord);
     setStockMax(*newMachine,getStockInit(machine));
     setStockCurDechet(*newMachine,0);
-    setStockCurDechet2(*newMachine,0);
     setStockCurRessource(*newMachine,0);
-    setStockCurRessource2(*newMachine,0);
     setNiveauMachine(*newMachine,1);
     return 1;
   }
@@ -245,6 +213,8 @@ void getSortieDynamique(ligneDeProduction* ligneDeProduction, pointCard** sortie
 
 
 //TODO : A modifier pour éviter boucle infini
+
+//ligneDeProd caseAriver = coord , logneDeProd , directionArriver = direction départ
 int getFinCheminAux(ligneDeProduction* ligneDeProduction, coord* caseArriver, pointCard* directionArriver){
 
   if(ligneDeProduction == NULL){  //Pas de machine
@@ -322,40 +292,44 @@ int getFinChemin(ligneDeProduction* ligneDeProduction, coord** caseArriver, poin
   free(sortie);
   setNewCoord(c, directionArriver);
 #include <stdio.h>
-  printf("0\n");
   *caseArriver = c;
   if(*directionArriver == NORD) {
       printf("A\n");
       if(getLDPNord(ligneDeProduction) == NULL){
+        printf("Retour fonction : x=%d y=%d ret=0\n", (*caseArriver)->x, (*caseArriver)->y);
         return 0;
       }
       ligneDeProduction = getLDPNord(ligneDeProduction);
   } else if(*directionArriver == EST) {
       printf("B\n");
       if(getLDPEst(ligneDeProduction) == NULL){
+        printf("Retour fonction : x=%d y=%d ret=0\n", (*caseArriver)->x, (*caseArriver)->y);
         return 0;
       }
       ligneDeProduction = getLDPEst(ligneDeProduction);
   } else if(*directionArriver == SUD) {
       printf("C\n");
       if(getLDPSud(ligneDeProduction) == NULL){
+        printf("Retour fonction : x=%d y=%d ret=0\n", (*caseArriver)->x, (*caseArriver)->y);
         return 0;
       }
       ligneDeProduction = getLDPSud(ligneDeProduction);
   } else {
       printf("D\n");
       if(getLDPOuest(ligneDeProduction) == NULL){
+        printf("Retour fonction : x=%d y=%d ret=0\n", (*caseArriver)->x, (*caseArriver)->y);
         return 0;
       }
       ligneDeProduction = getLDPOuest(ligneDeProduction);
   }
-  printf("E\n");
+  printf("E\n");/*
   int nb_sortie1;
   pointCard* sortie1;
   getSortieDynamique(ligneDeProduction, &sortie1, &nb_sortie1);
   *directionArriver = sortie1[0];
-  free(sortie1);
+  free(sortie1);*/
   int ret = getFinCheminAux(ligneDeProduction, c, directionArriver);
   *caseArriver = c;
+  printf("Retour fonction : x=%d y=%d ret=%d\n", (*caseArriver)->x, (*caseArriver)->y , ret);
   return ret;
 }

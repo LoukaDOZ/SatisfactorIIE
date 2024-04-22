@@ -63,5 +63,8 @@ $(OBJ_DIR)/serveur.o: $(SRC_DIR)/serveur.c
 
 .PHONY: clean
 
+run:
+	./bin/satisfactoriie
+
 clean:
 	rm -f obj/*.o bin/satisfactoriie

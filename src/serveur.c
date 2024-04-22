@@ -78,7 +78,7 @@ int lancer_serveur(int port) {
   int maxs = se;
   int sockets[2];
   int ressources[2];
-  int nb_client;
+  int nb_client = 0;
   int tailleCarte;
   int quitter = 0;
   fd_set ensemble, temp;

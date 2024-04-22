@@ -558,10 +558,8 @@ void enleveDechet(carte* carte, int nb){
     ligneDeProduction* ldp = getListeLigneDeProduction(carte)->startList;
     while (ldp != NULL)
     {
-      if(getTypeMachine(getMachine(ldp)) == CROIX)
-        setStockCurDechet2(ldp,round(getStockCurDechet2(ldp)/nb));
-      setStockCurDechet(ldp,round(getStockCurDechet(ldp)/nb));
-      ldp = getLDPSuivante(ldp);
+        setStockCurDechet(ldp,round(getStockCurDechet(ldp)/nb));
+        ldp = getLDPSuivante(ldp);
     }
     setNbDechetPortail(carte,round((*carte).nbDechetPortail/nb));
 }
@@ -681,18 +679,8 @@ void setLigneDeProd(cellule* cellule){
     (*cellule).ligneDeProduction = (ligneDeProduction*) malloc(sizeof(ligneDeProduction));
 }
 
-//TODO
 void getNombresAleatoires(int tailleCarte, int *listeNombresAleatoires) {
-  listeNombresAleatoires[0] = 0;
-  listeNombresAleatoires[1] = 0;
-  listeNombresAleatoires[2] = 0;
-  listeNombresAleatoires[3] = 1;
-  listeNombresAleatoires[4] = 0;
-  listeNombresAleatoires[5] = 2;
-  listeNombresAleatoires[6] = 0;
-  listeNombresAleatoires[7] = 3;
-
-    /*listeNombresAleatoires[0] = rand()%tailleCarte;
+    listeNombresAleatoires[0] = rand()%tailleCarte;
     listeNombresAleatoires[1] = rand()%tailleCarte;
 
     do {
@@ -711,7 +699,7 @@ void getNombresAleatoires(int tailleCarte, int *listeNombresAleatoires) {
         listeNombresAleatoires[7] = rand()%tailleCarte;
     } while(((listeNombresAleatoires[6] == listeNombresAleatoires[0]) && (listeNombresAleatoires[7] == listeNombresAleatoires[1])) ||
             ((listeNombresAleatoires[6] == listeNombresAleatoires[2]) && (listeNombresAleatoires[7] == listeNombresAleatoires[3])) ||
-            ((listeNombresAleatoires[6] == listeNombresAleatoires[4]) && (listeNombresAleatoires[7] == listeNombresAleatoires[5])));*/
+            ((listeNombresAleatoires[6] == listeNombresAleatoires[4]) && (listeNombresAleatoires[7] == listeNombresAleatoires[5])));
 }
 
 carte* creationCarte(int taille){
@@ -755,225 +743,6 @@ carte* creationCarte(int taille){
     return Carte;
 }
 
-pointCard getoppose(pointCard pc) {
-  switch(pc) {
-    case NORD:
-      return SUD;
-    case EST:
-      return OUEST;
-    case SUD:
-      return NORD;
-    case OUEST:
-    default:
-      return EST;
-  }
-}
-
-void trieListe(pointCard* liste, int nb_element){
-  if(nb_element) return ;
-  if( liste[0]%2 > liste[1]%2){
-    pointCard pc = liste[0];
-    liste[0] = liste[1];
-    liste[1] = pc;
-  }
-}
-
-void printLDP(ligneDeProduction* ldp) {
-  switch(getTypeMachine(getMachine(ldp))) {
-    case TAPIS:
-      printf("TAPIS");
-      break;
-    case CROIX:
-      printf("CROIX");
-      break;
-    case DECHETTERIE:
-      printf("DECHETTERIE");
-      break;
-    case RECYCLAGE:
-      printf("RECYCLAGE");
-      break;
-    case COLLECTEUR:
-      printf("COLLECTEUR");
-      break;
-  }
-
-  coord* c = getCoordLDP(ldp);
-  printf(" en %d %d", getCoordX(c), getCoordY(c));
-}
-
-int appliquer_effet_gael_thomas(int ressources, int nb_gael, int chance) {
-  int total = ressources;
-
-  if(chance > 0) {
-    for(int i = 0; i < ressources; i++) {
-      printf("R %d\n", i);
-      for(int j = 0; j < nb_gael; j++) {
-        printf("GAEL %d : ", j);
-        int r = rand() % chance;
-        printf("%d\n", r);
-        if(r == 0) {
-          printf("Total %d -> ", total);
-          total--;
-          printf("%d\n", total);
-          break;
-        }
-      }
-    }
-  }
-
-  return total;
-}
-
-void traitementMachine(ligneDeProduction* ldp, pointCard* origine, 
-    listeLigneDeProduction* machines_traitees, carte* plateau, int* cptNewR) {
-  ligneDeProduction* chercher = getStartListLDP(machines_traitees);
-  int trouvee = 0;
-  while(chercher != NULL) {
-    if(compareCoord2(getCoordLDP(ldp), getCoordLDP(chercher)) == 0) {
-      trouvee = 1;
-      break;
-    }
-    chercher = getLDPSuivante(chercher);
-  }
-  
-  if(!trouvee) {
-    ligneDeProduction* new = (ligneDeProduction*) malloc(sizeof(ligneDeProduction));
-    setCoordLDP(new, getCoordLDP(ldp));
-    new->suivant = NULL;
-    new->ldpNord = NULL;
-    new->ldpEst = NULL;
-    new->ldpSud = NULL;
-    new->ldpOuest = NULL;
-    insertionListLDP(machines_traitees, new, getTaille(plateau));
-
-    /// A FAIRE
-    if(getTypeMachine(getMachine(ldp)) != DECHETTERIE) {
-      pointCard sortie;
-      int nb;
-      pointCard* liste;
-      getSortieDynamique(ldp, &liste, &nb);
-      trieListe(liste, nb);
-      for(int i = 0; i < nb; i++){
-        switch(getTypeMachine(getMachine(ldp))) {
-          case COLLECTEUR:
-          case TAPIS:
-          case RECYCLAGE:
-            sortie = liste[i];
-            break;
-          case CROIX:
-            sortie = liste[i];
-            break;
-          default:;
-        }
-
-        ligneDeProduction* ldp_suivante;
-        int plusx = 0;
-        int plusy = 0;
-        switch(sortie) {
-          case NORD:
-            ldp_suivante = getLDPNord(ldp);
-            plusy = -1;
-            break;
-          case EST:
-            ldp_suivante = getLDPEst(ldp);
-            plusx = +1;
-            break;
-          case SUD:
-            ldp_suivante = getLDPSud(ldp);
-            plusy = +1;
-            break;
-          case OUEST:
-            ldp_suivante = getLDPOuest(ldp);
-            plusx = -1;
-            break;
-        }
-        //SUITE
-        int bool_croix = 0;
-        if(ldp_suivante != NULL) {
-          int suivante_a_entree = 0;
-          int nb2;
-          pointCard* liste2;
-          getEntreeDynamique(ldp_suivante, &liste2, &nb2);
-
-          for(int j = 0; j < nb2; j++) {
-            if(liste2[j] == getoppose(sortie)){
-              suivante_a_entree = 1;
-              if(getTypeMachine(getMachine(ldp_suivante))== CROIX){
-                  bool_croix = liste2[j]%2;
-              }
-            }
-          }
-          free(liste2);
-          // MODIF
-          if(suivante_a_entree) {
-            pointCard opp = getoppose(sortie);
-            traitementMachine(ldp_suivante, &opp, machines_traitees, plateau, cptNewR);
-
-            switch(getTypeMachine(getMachine(ldp_suivante))) {
-              case TAPIS: ;
-                if(getTypeMachine(getMachine(ldp)) != RECYCLAGE)
-                  ldp_suivante->stockCourrantDechet[0] += ldp->stockCourrantDechet[i];
-                ldp_suivante->stockCourrantRessource[0] += ldp->stockCourrantRessource[i];
-                break;
-              case RECYCLAGE:
-              case DECHETTERIE:
-                if(ldp_suivante->stockCourrantDechet[0] + ldp->stockCourrantDechet[i] > getStockMax(ldp_suivante)) {
-                  plateau->nbDechetPortail += ldp->stockCourrantDechet[i] - (getStockMax(ldp_suivante) - ldp_suivante->stockCourrantDechet[0]);
-                  ldp_suivante->stockCourrantDechet[0] = getStockMax(ldp_suivante);
-                } else
-                  ldp_suivante->stockCourrantDechet[0] += ldp->stockCourrantDechet[i];
-                break;
-              case CROIX:
-                if(getTypeMachine(getMachine(ldp)) != RECYCLAGE)
-                  ldp_suivante->stockCourrantDechet[bool_croix] += ldp->stockCourrantDechet[i];
-                ldp_suivante->stockCourrantRessource[bool_croix] += ldp->stockCourrantRessource[i];
-                break;
-              default:;
-            }
-
-            if(getTypeMachine(getMachine(ldp)) != RECYCLAGE)
-              ldp->stockCourrantDechet[i] = 0;
-            ldp->stockCourrantRessource[i] = 0;
-          } else {
-            if(getTypeMachine(getMachine(ldp)) != RECYCLAGE) {
-              plateau->nbDechetPortail += ldp->stockCourrantDechet[i];
-              ldp->stockCourrantDechet[i] = 0;
-            }
-            ldp->stockCourrantRessource[i] = 0;
-          }
-        } else { //Si case vide
-          coord sortiec;
-          setCoord(&sortiec, getCoordX(getCoordLDP(ldp)) + plusx, getCoordY(getCoordLDP(ldp)) + plusy, getTaille(plateau));
-
-          if(compareCoord2(getCoordPorte(plateau), &sortiec) == 0) {
-            if(getTypeMachine(getMachine(ldp)) != RECYCLAGE) {
-              plateau->nbDechetPortail += ldp->stockCourrantDechet[i];
-              ldp->stockCourrantDechet[i] = 0;
-            }
-            plateau->nbRessourcePortail += ldp->stockCourrantRessource[i]*(1 + CountById(getListePersonnel(plateau), 16));
-            *cptNewR += ldp->stockCourrantRessource[i];
-            ldp->stockCourrantRessource[i] = 0;
-          } else {
-            if(getTypeMachine(getMachine(ldp)) != RECYCLAGE) {
-              plateau->nbDechetPortail += ldp->stockCourrantDechet[i];
-              ldp->stockCourrantDechet[i] = 0;
-            }
-            ldp->stockCourrantRessource[i] = 0;
-          }
-        }
-      }
-      free(liste);
-    }
-  }
-}
-
-void free_machine_traitee(ligneDeProduction* ldp) {
-  if(ldp != NULL) {
-    free_machine_traitee(getLDPSuivante(ldp));
-    free(ldp);
-  }
-}
-
 void terminerTour(carte *carte){
   fisa* fisa = (*carte).fisa;
   fise* fise= (*carte).fise;
@@ -989,36 +758,59 @@ void terminerTour(carte *carte){
     updateCout3(getRessourceJoueur(carte),(carte->nbFISE)*getProductionFISE(fise)->DD,(carte->nbFISE)*getProductionFISE(fise)->E);
 
     //Déplacer ressources et déchet
+    
     int cptNewRessource = 0;
     ligneDeProduction* ldp = carte->listeLigneDeProduction->startList;
-    listeLigneDeProduction* machines_traitees = initialisationListeLDP();
     while(ldp != NULL){
-      traitementMachine(ldp, NULL, machines_traitees, carte, &cptNewRessource);
+      if(getTypeMachine(getMachine(ldp)) != CROIX && getTypeMachine(getMachine(ldp)) != TAPIS && getTypeMachine(getMachine(ldp)) != DECHETTERIE){
+        pointCard entree;
+        coord* coordLDP;
+        int ret = getFinChemin(ldp ,&coordLDP , &entree );
+        if(ret == 0){ //0 si pas de machine sur la case d'arrivée
+          carte->nbDechetPortail += ldp->stockCourrantDechet;
+          ldp->stockCourrantDechet = 0;
+          if(compareCoord3(carte->coordPorte,coordLDP)){
+            cptNewRessource += ldp->stockCourrantRessource;
+            carte->nbRessourcePortail += (ldp->stockCourrantRessource)*(CountById(carte->listePersonnel,16)+1);
+          }
+          ldp->stockCourrantRessource = 0;
+        }
+        else if(ret == 1){ //1 si il y a une machine sur la case d'arriver avec une entré au bon endroit
+          ligneDeProduction* ldpSucc = findByCoordListLDP(carte->listeLigneDeProduction, coordLDP, carte->taille);
+          addRessource(ldpSucc, ldp->stockCourrantRessource);
+          ldp->stockCourrantRessource = 0;
+          addDechet(ldpSucc, ldp->stockCourrantDechet, &carte->nbDechetPortail);
+          ldp->stockCourrantDechet = 0;
+        }
+        else{ //2 si il y a une machine sur la case d'arriver avec aucune entrée à cette endroit
+          carte->nbDechetPortail += ldp->stockCourrantDechet;
+          ldp->stockCourrantDechet = 0;
+          ldp->stockCourrantRessource = 0;
+        }
+        free(coordLDP);
+      }
       ldp = ldp->suivant;
     }
-
-    free_machine_traitee(getStartListLDP(machines_traitees));
-    free(machines_traitees);
 
     //Remplir Sources
     if(getNbTours(carte) % getFrequenceProductionSource(carte) == 0){
       incrRessourceSource(carte);
     }
-
+    //Créer déchet porte
+    ajouterDechetPortail(carte,cptNewRessource);
     //Effet recycleur
     ldp = carte->listeLigneDeProduction->startList;
     while(ldp != NULL){
       if(getTypeMachine(getMachine(ldp)) == RECYCLAGE){
-        while(ldp->stockCourrantDechet[0] >= 10){
-          ldp->stockCourrantDechet[0] -= 10;
-          ldp->stockCourrantRessource[0] += 1;
+        while(ldp->stockCourrantDechet >= 10){
+          ldp->stockCourrantDechet -= 10;
+          ldp->stockCourrantRessource += 1;
         }
       }
       ldp = ldp->suivant;
     }
 
-    //Créer déchet porte
-    ajouterDechetPortail(carte,cptNewRessource);
+    //Effet collecteur
 
     //Ressource
     for(int i=0; i< NB_SOURCES_PLATEAU; i++){
@@ -1037,7 +829,7 @@ void terminerTour(carte *carte){
         setCoordX(&coordOuest,getCoordX(&coordOuest)-1);
         ligneDeProduction* ldpNord = findByCoordListLDP(carte->listeLigneDeProduction, &coordNord, carte->taille);
         if(carte->nbRessourceSource[i] != 0 && ldpNord != NULL && getTypeMachine(getMachine(ldpNord)) == COLLECTEUR){
-          int j = carte->nbRessourceSource[i] - ldpNord->stockMax + ldpNord->stockCourrantDechet[0] + ldpNord->stockCourrantRessource[0];
+          int j = carte->nbRessourceSource[i] - ldpNord->stockMax + ldpNord->stockCourrantDechet + ldpNord->stockCourrantRessource;
           if(j < 0){
             addRessource(ldpNord,carte->nbRessourceSource[i]);
             carte->nbRessourceSource[i] = 0;
@@ -1049,7 +841,7 @@ void terminerTour(carte *carte){
         }
         ligneDeProduction* ldpOuest= findByCoordListLDP(carte->listeLigneDeProduction, &coordOuest, carte->taille);
         if(carte->nbRessourceSource[i] != 0 && ldpOuest != NULL && getTypeMachine(getMachine(ldpOuest)) == COLLECTEUR){
-          int j = carte->nbRessourceSource[i] - ldpOuest->stockMax + ldpOuest->stockCourrantDechet[0] + ldpOuest->stockCourrantRessource[0];
+          int j = carte->nbRessourceSource[i] - ldpOuest->stockMax + ldpOuest->stockCourrantDechet + ldpOuest->stockCourrantRessource;
           if(j < 0){
             addRessource(ldpOuest,carte->nbRessourceSource[i]);
             carte->nbRessourceSource[i] = 0;
@@ -1061,7 +853,7 @@ void terminerTour(carte *carte){
         }
         ligneDeProduction* ldpEst = findByCoordListLDP(carte->listeLigneDeProduction, &coordEst, carte->taille);
         if(carte->nbRessourceSource[i] != 0 && ldpEst != NULL && getTypeMachine(getMachine(ldpEst)) == COLLECTEUR){
-          int j = carte->nbRessourceSource[i] - ldpEst->stockMax + ldpEst->stockCourrantDechet[0] + ldpEst->stockCourrantRessource[0];
+          int j = carte->nbRessourceSource[i] - ldpEst->stockMax + ldpEst->stockCourrantDechet + ldpEst->stockCourrantRessource;
           if(j < 0){
             addRessource(ldpEst,carte->nbRessourceSource[i]);
             carte->nbRessourceSource[i] = 0;
@@ -1073,7 +865,7 @@ void terminerTour(carte *carte){
         }
         ligneDeProduction* ldpSud = findByCoordListLDP(carte->listeLigneDeProduction, &coordSud, carte->taille);
         if(carte->nbRessourceSource[i] != 0 && ldpSud != NULL && getTypeMachine(getMachine(ldpSud)) == COLLECTEUR){
-          int j = carte->nbRessourceSource[i] - ldpSud->stockMax + ldpSud->stockCourrantDechet[0] + ldpSud->stockCourrantRessource[0];
+          int j = carte->nbRessourceSource[i] - ldpSud->stockMax + ldpSud->stockCourrantDechet + ldpSud->stockCourrantRessource;
           if(j < 0){
             addRessource(ldpSud,carte->nbRessourceSource[i]);
             carte->nbRessourceSource[i] = 0;
@@ -1088,23 +880,8 @@ void terminerTour(carte *carte){
       
     }
     
-    //Dechets porte
+    //Dechet
     if(carte->nbDechetPortail != 0){
-        int nb_gael = CountById(getListePersonnel(carte), 17);
-        int chance = 0;
-
-        if(nb_gael > 0) {
-          personnelCarte* pc = getStartListPersonnel(getListePersonnel(carte));
-          while(pc != NULL) {
-            if(getNumPersonnel(getPersonnel(pc)) == 17) {
-              chance = getCoutE(getPersonnel(pc)->action);
-              break;
-            }
-
-            pc = getPersonnelSuivant(pc);
-          }
-        }
-
         coord coordNord;
         setCoord2(&coordNord,carte->coordPorte);
         setCoordY(&coordNord,getCoordY(&coordNord)+1);
@@ -1119,65 +896,49 @@ void terminerTour(carte *carte){
         setCoordX(&coordOuest,getCoordX(&coordOuest)-1);
         ligneDeProduction* ldpNord = findByCoordListLDP(carte->listeLigneDeProduction, &coordNord, carte->taille);
         if(carte->nbDechetPortail != 0 && ldpNord != NULL && getTypeMachine(getMachine(ldpNord)) == COLLECTEUR){
-          int j = carte->nbDechetPortail - ldpNord->stockMax + ldpNord->stockCourrantDechet[0] + ldpNord->stockCourrantRessource[0];
+          int j = carte->nbDechetPortail - ldpNord->stockMax + ldpNord->stockCourrantDechet + ldpNord->stockCourrantRessource;
           if(j < 0){
-            addDechet(ldpNord,
-              appliquer_effet_gael_thomas(carte->nbDechetPortail, nb_gael, chance), 
-              &carte->nbDechetPortail);
+            addRessource(ldpNord,carte->nbDechetPortail);
             carte->nbDechetPortail = 0;
           }
           else{
-            addDechet(ldpNord,
-              appliquer_effet_gael_thomas(carte->nbDechetPortail - j, nb_gael, chance), 
-              &carte->nbDechetPortail);
+            addRessource(ldpNord,carte->nbDechetPortail - j);
             carte->nbDechetPortail = j;
           }
         }
         ligneDeProduction* ldpOuest= findByCoordListLDP(carte->listeLigneDeProduction, &coordOuest, carte->taille);
         if(carte->nbDechetPortail != 0 && ldpOuest != NULL && getTypeMachine(getMachine(ldpOuest)) == COLLECTEUR){
-          int j = carte->nbDechetPortail - ldpOuest->stockMax + ldpOuest->stockCourrantDechet[0] + ldpOuest->stockCourrantRessource[0];
+          int j = carte->nbDechetPortail - ldpOuest->stockMax + ldpOuest->stockCourrantDechet + ldpOuest->stockCourrantRessource;
           if(j < 0){
-            addDechet(ldpOuest,
-              appliquer_effet_gael_thomas(carte->nbDechetPortail, nb_gael, chance), 
-              &carte->nbDechetPortail);
+            addRessource(ldpOuest,carte->nbDechetPortail);
             carte->nbDechetPortail = 0;
           }
           else{
-            addDechet(ldpOuest,
-              appliquer_effet_gael_thomas(carte->nbDechetPortail - j, nb_gael, chance), 
-              &carte->nbDechetPortail);
+            addRessource(ldpOuest,carte->nbDechetPortail - j);
             carte->nbDechetPortail = j;
           }
         }
         ligneDeProduction* ldpEst = findByCoordListLDP(carte->listeLigneDeProduction, &coordEst, carte->taille);
         if(carte->nbDechetPortail != 0 && ldpEst != NULL && getTypeMachine(getMachine(ldpEst)) == COLLECTEUR){
-          int j = carte->nbDechetPortail - ldpEst->stockMax + ldpEst->stockCourrantDechet[0] + ldpEst->stockCourrantRessource[0];
+          int j = carte->nbDechetPortail - ldpEst->stockMax + ldpEst->stockCourrantDechet + ldpEst->stockCourrantRessource;
           if(j < 0){
-            addDechet(ldpEst,
-              appliquer_effet_gael_thomas(carte->nbDechetPortail, nb_gael, chance), 
-              &carte->nbDechetPortail);
+            addRessource(ldpEst,carte->nbDechetPortail);
             carte->nbDechetPortail= 0;
           }
           else{
-            addDechet(ldpEst,
-              appliquer_effet_gael_thomas(carte->nbDechetPortail - j, nb_gael, chance), 
-              &carte->nbDechetPortail);
+            addRessource(ldpEst,carte->nbDechetPortail - j);
             carte->nbDechetPortail = j;
           }
         }
         ligneDeProduction* ldpSud = findByCoordListLDP(carte->listeLigneDeProduction, &coordSud, carte->taille);
         if(carte->nbDechetPortail != 0 && ldpSud != NULL && getTypeMachine(getMachine(ldpSud)) == COLLECTEUR){
-          int j = carte->nbDechetPortail - ldpSud->stockMax + ldpSud->stockCourrantDechet[0] + ldpSud->stockCourrantRessource[0];
+          int j = carte->nbDechetPortail - ldpSud->stockMax + ldpSud->stockCourrantDechet + ldpSud->stockCourrantRessource;
           if(j < 0){
-            addDechet(ldpSud,
-              appliquer_effet_gael_thomas(carte->nbDechetPortail, nb_gael, chance), 
-              &carte->nbDechetPortail);
+            addRessource(ldpSud,carte->nbDechetPortail);
             carte->nbDechetPortail = 0;
           }
           else{
-            addDechet(ldpSud,
-              appliquer_effet_gael_thomas(carte->nbDechetPortail - j, nb_gael, chance), 
-              &carte->nbDechetPortail);
+            addRessource(ldpSud,carte->nbDechetPortail - j);
             carte->nbDechetPortail = j;
           }
         }
@@ -1187,30 +948,6 @@ void terminerTour(carte *carte){
     if(getNbDechetPortail(carte)>0){
       updateCout2(getRessourceJoueur(carte),getNbDechetPortail(carte),0);
     }
-
-    /*coord cc1;
-    coord cc2;
-    coord cc3;
-    coord cc4;
-    coord cc5;
-    coord cc6;
-    coord cc7;
-    setCoord(&cc1, 1, 0, getTaille(carte));
-    setCoord(&cc2, 2, 0, getTaille(carte));
-    setCoord(&cc3, 2, 1, getTaille(carte));
-    setCoord(&cc4, 2, 2, getTaille(carte));
-    setCoord(&cc5, 1, 2, getTaille(carte));
-    setCoord(&cc6, 1, 1, getTaille(carte));
-    setCoord(&cc7, 3, 0, getTaille(carte));
-    findByCoordListLDP(getListeLigneDeProduction(carte), &cc1, getTaille(carte))->stockCourrantDechet[0] = 50;
-    findByCoordListLDP(getListeLigneDeProduction(carte), &cc2, getTaille(carte))->stockCourrantDechet[0] = 3;
-    findByCoordListLDP(getListeLigneDeProduction(carte), &cc3, getTaille(carte))->stockCourrantDechet[0] = 0;
-    findByCoordListLDP(getListeLigneDeProduction(carte), &cc3, getTaille(carte))->stockCourrantDechet[1] = 145;
-    findByCoordListLDP(getListeLigneDeProduction(carte), &cc4, getTaille(carte))->stockCourrantDechet[0] = 46;
-    findByCoordListLDP(getListeLigneDeProduction(carte), &cc5, getTaille(carte))->stockCourrantDechet[0] = 2;
-    findByCoordListLDP(getListeLigneDeProduction(carte), &cc6, getTaille(carte))->stockCourrantDechet[0] = 32;
-    findByCoordListLDP(getListeLigneDeProduction(carte), &cc7, getTaille(carte))->stockCourrantDechet[0] = 13;
-    */carte->nbDechetPortail = 22;
 
     //Incrémentation nbTour
     (*carte).nbTours++;

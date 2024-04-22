@@ -33,8 +33,8 @@ struct ligneDeProduction
   machine* machine;
   coord* coordCarte;
   int stockMax;
-  int stockCourrantDechet[2];
-  int stockCourrantRessource[2];
+  int stockCourrantDechet;
+  int stockCourrantRessource;
   int niveauMachine;
 };
 
@@ -245,10 +245,6 @@ int getStockCurDechet(ligneDeProduction* ligneDeProduction);
  */
 void setStockCurDechet(ligneDeProduction* ligneDeProduction, int stock);
 
-int getStockCurDechet2(ligneDeProduction* ligneDeProduction);
-
-void setStockCurDechet2(ligneDeProduction* ligneDeProduction, int stock);
-
 /********** Stock courrant dechet **********/
 
 /**
@@ -268,10 +264,6 @@ int getStockCurRessource(ligneDeProduction* ligneDeProduction);
  *
  */
 void setStockCurRessource(ligneDeProduction* ligneDeProduction, int stock);
-
-int getStockCurRessource2(ligneDeProduction* ligneDeProduction);
-
-void setStockCurRessource2(ligneDeProduction* ligneDeProduction, int stock);
 
 /********** Ajoue stock courrant **********/
 
@@ -299,13 +291,6 @@ int addDechet(ligneDeProduction* ligneDeProduction, int val, int* nbDechetPortai
  *
  */
 int addRessource(ligneDeProduction* ligneDeProduction, int val);
-
-
-int addDechet2(ligneDeProduction* ligneDeProduction, int val);
-
-int addRessource2(ligneDeProduction* ligneDeProduction, int val);
-
-int getDechet(ligneDeProduction* ligneDeProduction);
 
 /********** Machine **********/
 

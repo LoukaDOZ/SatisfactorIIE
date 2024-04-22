@@ -24,7 +24,7 @@ int main(void) {
             if (pid == -1) {
                 perror("fork");
                 return EXIT_FAILURE;
-            } else if (pid == 0) {
+            } else if (pid > 0) {
                 lancer_serveur(port);
                 return EXIT_SUCCESS;
             }
@@ -65,79 +65,6 @@ int main(void) {
     int ressourcesAdversaire = 0;
     typeFinPartie tfp = DEFAITE;
     /* Boucle principale du jeu dans laquelle se déroule la partie */
-
-    coord cc1;
-    coord cc2;
-    coord cc3;
-    coord cc4;
-    coord cc5;
-    coord cc6;
-    coord cc7;
-    setCoord(&cc1, 1, 0, getTaille(plateau));
-    setCoord(&cc2, 2, 0, getTaille(plateau));
-    setCoord(&cc3, 2, 1, getTaille(plateau));
-    setCoord(&cc4, 2, 2, getTaille(plateau));
-    setCoord(&cc5, 1, 2, getTaille(plateau));
-    setCoord(&cc6, 1, 1, getTaille(plateau));
-    setCoord(&cc7, 3, 0, getTaille(plateau));
-    
-    achatMachine(
-        getListeLigneDeProduction(plateau),
-        liste_machines[0],
-        &cc1, 
-        EST, 
-        getRessourceJoueur(plateau),
-        plateau
-    );
-    achatMachine(
-        getListeLigneDeProduction(plateau),
-        liste_machines[1],
-        &cc2, 
-        EST, 
-        getRessourceJoueur(plateau),
-        plateau
-    );
-    achatMachine(
-        getListeLigneDeProduction(plateau),
-        liste_machines[2],
-        &cc3, 
-        NORD, 
-        getRessourceJoueur(plateau),
-        plateau
-    );
-    achatMachine(
-        getListeLigneDeProduction(plateau),
-        liste_machines[3],
-        &cc4, 
-        NORD, 
-        getRessourceJoueur(plateau),
-        plateau
-    );
-    achatMachine(
-        getListeLigneDeProduction(plateau),
-        liste_machines[4],
-        &cc5, 
-        EST, 
-        getRessourceJoueur(plateau),
-        plateau
-    );
-    achatMachine(
-        getListeLigneDeProduction(plateau),
-        liste_machines[0],
-        &cc6, 
-        NORD, 
-        getRessourceJoueur(plateau),
-        plateau
-    );
-    achatMachine(
-        getListeLigneDeProduction(plateau),
-        liste_machines[1],
-        &cc7, 
-        EST, 
-        getRessourceJoueur(plateau),
-        plateau
-    );
-    
     while(1) {
         if(quitter) {
             tfp = DEFAITE;

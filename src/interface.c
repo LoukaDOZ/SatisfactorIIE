@@ -519,7 +519,7 @@ void printf_info_cellule(carte* plateau, int x, int y) {
                 for(int i = 0; i < nb; i++)
                     printf("\t\t- %s\n", string_of_point_card(liste[i]));
             }
-            free(liste);
+
             getSortieDynamique(ldp, &liste, &nb);
             if(nb > 0) {
                 definir_couleur_texte(CYAN);
@@ -529,26 +529,19 @@ void printf_info_cellule(carte* plateau, int x, int y) {
                 for(int i = 0; i < nb; i++)
                     printf("\t\t- %s\n", string_of_point_card(liste[i]));
             }
-            free(liste);
+
             definir_couleur_texte(CYAN);
-            printf("\tStock : ");
-
-            definir_couleur_texte(BLANC);
-            if(tp == COLLECTEUR || tp == TAPIS || tp == RECYCLAGE) {
-                printf("%d ressources + %d déchets = %d ", 
-                    getStockCurRessource(ldp), getStockCurDechet(ldp), 
-                    (getStockCurRessource(ldp) + getStockCurDechet(ldp)));
-            } else if(tp == CROIX) {
-                printf("\n\t\t- (verticales) %d ressources + %d déchets = %d ", 
-                    getStockCurRessource(ldp), getStockCurDechet(ldp), 
-                    (getStockCurRessource(ldp) + getStockCurDechet(ldp)));
-                printf("\n\t\t- (horizontales) %d ressources + %d déchets = %d ", 
-                    getStockCurRessource2(ldp), getStockCurDechet2(ldp), 
-                    (getStockCurRessource2(ldp) + getStockCurDechet2(ldp)));
-            } else
-                printf("%d déchets ", getStockCurDechet(ldp));
-
             if(tp != TAPIS && tp != CROIX) {
+                printf("\tStock : ");
+
+                definir_couleur_texte(BLANC);
+                if(tp == COLLECTEUR) {
+                    printf("%d ressources + %d déchets = %d ", 
+                        getStockCurRessource(ldp), getStockCurDechet(ldp), 
+                        (getStockCurRessource(ldp) + getStockCurDechet(ldp)));
+                } else {
+                    printf("%d déchets ", getStockCurDechet(ldp));
+                }
                 printf("/ %d\n", getStockMax(ldp));
 
                 definir_couleur_texte(CYAN);
@@ -562,10 +555,7 @@ void printf_info_cellule(carte* plateau, int x, int y) {
                 printf("%d -> %d (+ %d)\n", getStockMax(ldp), 
                     (getStockMax(ldp) + getStockUp(m)), getStockUp(m));
             } else {
-                definir_couleur_texte(CYAN);
-                printf("\n\tAmélioration : ");
-                definir_couleur_texte(BLANC);
-                printf("Pas d'amélioration possible\n");
+                printf("\t(Pas d'amélioration possible)\n");
             }
 
             definir_couleur_texte(CYAN);

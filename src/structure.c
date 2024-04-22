@@ -77,6 +77,7 @@ void insertionListLDP(listeLigneDeProduction *liste, ligneDeProduction* ligneDeP
   setLDPEst(ligneDeProd,voisinEst);
   if(voisinEst != NULL)
     setLDPOuest(voisinEst,ligneDeProd);
+ 
 
   ligneDeProduction* voisinSud = findByCoordListLDP_aux(liste->startList,&coordSud, sizeCarte);
   setLDPSud(ligneDeProd,voisinSud);

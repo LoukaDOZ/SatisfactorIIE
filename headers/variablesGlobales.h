@@ -1,8 +1,8 @@
 #ifndef VARIABLESGLOBALES_H
 #define VARIABLESGLOBALES_H
 /////////////////////////////////////////////////////////////////////////////////
-#define E_INITIAL 10000
-#define DD_INITIAL 10000
+#define E_INITIAL 100
+#define DD_INITIAL 100
 #define NB_SOURCES_PLATEAU 3
 #define NB_RESSOURCES_PRODUITES_SOURCE 3
 #define NB_INITIAL_FISE 5

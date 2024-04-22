@@ -5,7 +5,15 @@ One or two players.
 
 ## Usage
 
+| Command      | Description      |
+|--------------|------------------|
+| `make all`   | Build project    |
+| `make run`   | Run project      |
+| `make clean` | Clear built file |
+
+## Example
+
 ```bash
 make
-./bin/satisfactoriie
+make run
 ```
