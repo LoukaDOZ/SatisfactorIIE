@@ -7,11 +7,11 @@ One or two players.
 
 ## Usage
 
-| Command      | Description      |
-|--------------|------------------|
-| `make all`   | Build project    |
-| `make run`   | Run project      |
-| `make clean` | Clear built file |
+| Command      | Description       |
+|--------------|-------------------|
+| `make all`   | Build project     |
+| `make run`   | Run project       |
+| `make clean` | Clear built files |
 
 ## Example
 
